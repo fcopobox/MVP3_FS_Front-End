@@ -1,27 +1,23 @@
-import { useEffect, type ReactNode } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useAuth } from "@/context/AuthContext";
-import Loader from "@/components/Loader";
+import { ReactNode } from "react";
+import { Navigate } from "@tanstack/react-router";
+import { useAuth } from "../context/AuthContext";
 
-export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { ready, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+type ProtectedRouteProps = {
+  children: ReactNode;
+};
 
-  useEffect(() => {
-    if (ready && !isAuthenticated) {
-      void navigate({ to: "/login", replace: true });
-    }
-  }, [ready, isAuthenticated, navigate]);
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const isBrowser = typeof window !== "undefined";
 
-  if (!ready || !isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader label="Verificando sessão..." />
-      </div>
-    );
-  }
+  if (!isBrowser) return null;
+
+  const { isAuthenticated, ready } = useAuth();
+
+  console.log("ProtectedRoute → ready:", ready);
+  console.log("ProtectedRoute → isAuthenticated:", isAuthenticated);
+  if (!ready) return <div>Carregando...</div>;
+
+  if (!isAuthenticated) return <Navigate to="/login" />;
 
   return <>{children}</>;
 }
-
-export default ProtectedRoute;

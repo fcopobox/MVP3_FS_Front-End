@@ -8,10 +8,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-
 import appCss from "../styles.css?url";
-import { AuthProvider } from "@/context/AuthContext";
-
+import { AuthProvider } from "../context/AuthContext";
 
 function NotFoundComponent() {
   return (
@@ -118,16 +116,44 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+import { Auth0Provider } from "@auth0/auth0-react";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  const isBrowser = typeof window !== "undefined";
+
+  if (!isBrowser) {
+    // SSR: não renderiza Auth0Provider nem AuthProvider
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    );
+  }
+
+  // Client: renderiza tudo normalmente
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </AuthProvider>
+      <Auth0Provider
+        domain={import.meta.env["VITE_AUTH0_DOMAIN"]}
+        clientId={import.meta.env["VITE_AUTH0_CLIENT_ID"]}
+        authorizationParams={{
+          redirect_uri: "http://localhost:8080/",
+          audience: import.meta.env["VITE_AUTH0_AUDIENCE"],
+          scope: "openid profile email",
+        }}
+        cacheLocation="localstorage"
+        useRefreshTokens={true}
+      >
+        <AuthProvider>
+          <Outlet />
+        </AuthProvider>
+      </Auth0Provider>
     </QueryClientProvider>
   );
 }
+
+export { RootComponent };
+
 

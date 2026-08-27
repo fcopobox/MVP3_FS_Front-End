@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import { ProtectedRoute } from "../components/ProtectedRoute";
 import Header from "@/components/Header";
 import LocationForm from "@/components/LocationForm";
 import WeatherPanel from "@/components/WeatherPanel";
@@ -9,6 +9,7 @@ import ApiKeyNotice from "@/components/ApiKeyNotice";
 import Loader from "@/components/Loader";
 import { AppProvider, useApp } from "@/context/AppContext";
 import { ForecastPanel } from "@/components/ForecastPanel";
+
 
 const GeoMap = lazy(() => import("@/components/GeoMap"));
 
@@ -64,12 +65,10 @@ function MapArea() {
 // ======================================================
 function MainScreen() {
   return (
-    <ProtectedRoute>
-      <AppProvider>
-        <Header />
-        <InnerMainScreen />
-      </AppProvider>
-    </ProtectedRoute>
+    <AppProvider>
+      <Header />
+      <InnerMainScreen />
+    </AppProvider>
   );
 }
 
