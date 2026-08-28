@@ -8,16 +8,19 @@ import {
 } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-export type AuthUser = { name?: string | undefined; email?: string | undefined };
+export type AuthUser = {
+    name: string | undefined;
+    email: string | undefined;
+};
 
 type AuthContextValue = {
     token: string | null;
     user: AuthUser | null;
     ready: boolean;
     isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string) => Promise<void>;
-    resetPassword: (email: string) => Promise<void>;
+    login: () => Promise<void>;
+    register: () => Promise<void>;
+    resetPassword: () => Promise<void>;
     logout: () => void;
 };
 
@@ -36,6 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
     const [ready, setReady] = useState(false);
 
+    console.log("AUTH0 → isAuthenticated:", isAuthenticated);
+    console.log("AUTH0 → user:", user);
+    console.log("AUTH0 → authLoading:", authLoading);
+
+
     // Obtém token real do Auth0
     useEffect(() => {
         async function fetchToken() {
@@ -43,6 +51,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setToken(null);
                 setReady(true);
                 return;
+            }
+            console.log("AUTH_CONTEXT → token:", token);
+            console.log("AUTH_CONTEXT → ready:", ready);
+            if (isAuthenticated) {
+                console.log("AUTH_CONTEXT → usuário autenticado, obtendo token...");
+            } else {
+                console.log("AUTH_CONTEXT → usuário NÃO autenticado");
             }
 
             try {
@@ -59,25 +74,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fetchToken();
     }, [isAuthenticated, getAccessTokenSilently]);
 
-    // Mantemos a API antiga para não quebrar nada
     const login = async () => {
         await loginWithRedirect();
     };
 
     const register = async () => {
-        // Registro agora é responsabilidade do Auth0
-        // Você pode implementar via Auth0 Management API se quiser
         throw new Error("Registro via Auth0 não implementado.");
     };
 
     const resetPassword = async () => {
-        // Reset de senha também é responsabilidade do Auth0
         throw new Error("Reset de senha via Auth0 não implementado.");
     };
 
     const logout = () => {
-        auth0Logout({ logoutParams: { returnTo: window.location.origin } });
+        auth0Logout({
+            logoutParams: {
+                returnTo: "http://localhost:8080/login",
+                // federated: true,
+            },
+        });
     };
+
 
     const value = useMemo(
         () => ({

@@ -1,6 +1,7 @@
 // Front-end only integrations. Auth goes to the FastAPI/Auth0 backend,
 // everything else (ViaCEP, Nominatim, OpenWeatherMap) is called directly.
 
+
 export const API_URL =
   (import.meta.env["VITE_API_URL"] as string | undefined) ?? "http://localhost:8000";
 
@@ -45,6 +46,7 @@ export type LoginResponse = {
   user?: { name?: string; email?: string };
 };
 
+/*
 export const authApi = {
   login: (email: string, password: string) =>
     postJson<LoginResponse>("/auth/login", { email, password }),
@@ -53,7 +55,7 @@ export const authApi = {
   resetPassword: (email: string) =>
     postJson<{ ok?: boolean }>("/auth/reset-password", { email }),
 };
-
+*/
 export type CepAddress = {
   cep: string;
   logradouro: string;

@@ -13,8 +13,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   const { isAuthenticated, ready } = useAuth();
 
-  console.log("ProtectedRoute → ready:", ready);
-  console.log("ProtectedRoute → isAuthenticated:", isAuthenticated);
+  console.log("PROTECTED_ROUTE → ready:", ready);
+  console.log("PROTECTED_ROUTE → isAuthenticated:", isAuthenticated);
+
+
   if (!ready) return <div>Carregando...</div>;
 
   if (!isAuthenticated) return <Navigate to="/login" />;

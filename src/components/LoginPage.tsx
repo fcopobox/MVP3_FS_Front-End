@@ -26,7 +26,7 @@ export function LoginPage() {
         setError(null);
 
         try {
-            // 🔥 Agora o login é totalmente Auth0
+            // Agora o login é totalmente Auth0
             await loginWithRedirect();
         } catch (err) {
             console.error(err);

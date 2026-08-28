@@ -123,6 +123,12 @@ function RootComponent() {
 
   const isBrowser = typeof window !== "undefined";
 
+  // Logs 
+  console.log("ROOT → Auth0Provider carregado");
+  console.log("ROOT → redirect_uri:", "http://localhost:8080/");
+  console.log("ROOT → audience:", import.meta.env["VITE_AUTH0_AUDIENCE"]);
+  console.log("ROOT → domain:", import.meta.env["VITE_AUTH0_DOMAIN"]);
+
   if (!isBrowser) {
     // SSR: não renderiza Auth0Provider nem AuthProvider
     return (
@@ -143,8 +149,8 @@ function RootComponent() {
           audience: import.meta.env["VITE_AUTH0_AUDIENCE"],
           scope: "openid profile email",
         }}
-        cacheLocation="localstorage"
-        useRefreshTokens={true}
+        cacheLocation="memory"
+        useRefreshTokens={false}
       >
         <AuthProvider>
           <Outlet />

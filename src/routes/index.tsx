@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
 });
 
 // ======================================================
-// MapArea continua igual — ele já está dentro do AppProvider
+// MapArea 
 // ======================================================
 function MapArea() {
   const { coords, cloudsVisible, toggleClouds, address, error, clearError } = useApp();
@@ -61,7 +61,7 @@ function MapArea() {
 }
 
 // ======================================================
-// MainScreen NÃO usa useApp()
+// MainScreen - não usa useApp()
 // ======================================================
 function MainScreen() {
   return (
@@ -76,7 +76,7 @@ function MainScreen() {
 
 
 // ======================================================
-// InnerMainScreen — aqui usamos useApp()
+// InnerMainScreen — useApp()
 // ======================================================
 function InnerMainScreen() {
   const { searchByCep, searchByRegion } = useApp();
