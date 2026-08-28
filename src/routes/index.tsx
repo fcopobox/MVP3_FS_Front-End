@@ -65,12 +65,15 @@ function MapArea() {
 // ======================================================
 function MainScreen() {
   return (
-    <AppProvider>
-      <Header />
-      <InnerMainScreen />
-    </AppProvider>
+    <ClientOnly fallback={<div>Carregando...</div>}>
+      <AppProvider>
+        <Header />
+        <InnerMainScreen />
+      </AppProvider>
+    </ClientOnly>
   );
 }
+
 
 // ======================================================
 // InnerMainScreen — aqui usamos useApp()

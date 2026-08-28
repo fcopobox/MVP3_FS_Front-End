@@ -1,0 +1,21 @@
+
+Run on PC1 PowerShell window:
+
+$udp = New-Object System.Net.Sockets.UdpClient(5000)
+$endpoint = New-Object System.Net.IPEndPoint([System.Net.IPAddress]::Any,0)
+Write-Host "Listening on UDP port 5000..."
+while ($true) {
+    $data = $udp.Receive([ref]$endpoint)
+    Write-Host "Received from $($endpoint.Address): $( [System.Text.Encoding]::ASCII.GetString($data) )"
+}
+
+
+Run on PC2 PowerWindow:
+
+$udp = New-Object System.Net.Sockets.UdpClient
+$bytes = [System.Text.Encoding]::ASCII.GetBytes("test")
+$udp.Send($bytes, $bytes.Length, "192.168.127.251", 5000)
+
+
+PC1 will listen the UDP port 5000
+PC2 will send a test messag 192.168.127.251, port 5000
