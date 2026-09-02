@@ -47,12 +47,51 @@ export type LoginResponse = {
 
 export const authApi = {
   login: (email: string, password: string) =>
-    postJson<LoginResponse>("/auth/login", { email, password }),
+    postJson<LoginResponse>("/login", { email, password }),
+
   register: (name: string, email: string, password: string) =>
-    postJson<{ ok?: boolean }>("/auth/register", { name, email, password }),
+    postJson<{ ok?: boolean; access_token?: string }>("/auth/register", {
+      name,
+      email,
+      password,
+    }),
+
   resetPassword: (email: string) =>
     postJson<{ ok?: boolean }>("/auth/reset-password", { email }),
+
+  updateUser: async (data: { name?: string; email?: string }, token: string) => {
+    const response = await fetch(`${API_URL}/auth/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => null);
+      throw new Error(err?.detail ?? "Erro ao atualizar usuário.");
+    }
+    return response.json();
+  },
+
+  deleteUser: async (token: string) => {
+    const response = await fetch(`${API_URL}/auth/delete`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => null);
+      throw new Error(err?.detail ?? "Erro ao excluir usuário.");
+    }
+    return response.json();
+  },
 };
+
 
 export type CepAddress = {
   cep: string;

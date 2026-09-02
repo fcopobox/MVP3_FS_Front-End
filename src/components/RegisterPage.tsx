@@ -19,9 +19,10 @@ export function RegisterPage() {
     setError(null);
     try {
       await register(name.trim(), email.trim(), password);
-      await navigate({ to: "/login", replace: true });
+      // ✅ já autenticado, vai para home
+      await navigate({ to: "/", replace: true });
     } catch (registerError) {
-      setError((registerError as Error).message);
+      setError((registerError as Error).message || "Erro ao cadastrar usuário.");
     } finally {
       setLoading(false);
     }
