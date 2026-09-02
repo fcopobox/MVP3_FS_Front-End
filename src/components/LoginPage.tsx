@@ -15,38 +15,24 @@ export function LoginPage() {
   useEffect(() => {
     if (ready && isAuthenticated) void navigate({ to: "/", replace: true });
   }, [ready, isAuthenticated, navigate]);
-/*
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
     setError(null);
+
     try {
-      await login(email.trim(), password);
+      // 🔥 MODO DESENVOLVIMENTO: simula login sem backend
+      localStorage.setItem("weathermap.token", "dev-token");
+      localStorage.setItem("weathermap.user", JSON.stringify({ email }));
+
       await navigate({ to: "/", replace: true });
     } catch (loginError) {
-      setError((loginError as Error).message);
+      setError("Erro no modo de desenvolvimento.");
     } finally {
       setLoading(false);
     }
   }
-*/
-async function onSubmit(event: FormEvent) {
-  event.preventDefault();
-  setLoading(true);
-  setError(null);
-
-  try {
-    // 🔥 MODO DESENVOLVIMENTO: simula login sem backend
-    localStorage.setItem("weathermap.token", "dev-token");
-    localStorage.setItem("weathermap.user", JSON.stringify({ email }));
-
-    await navigate({ to: "/", replace: true });
-  } catch (loginError) {
-    setError("Erro no modo de desenvolvimento.");
-  } finally {
-    setLoading(false);
-  }
-}
 
 
   return (
