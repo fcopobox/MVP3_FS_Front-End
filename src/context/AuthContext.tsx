@@ -24,21 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(false);
 
-  // Modo desenvolvimento: simula login sem backend
-  useEffect(() => {
-    if (!token) {
-      const fakeToken = "dev-token";
-      const fakeUser = { email: "dev@local" };
-
-      localStorage.setItem(TOKEN_KEY, fakeToken);
-      localStorage.setItem(USER_KEY, JSON.stringify(fakeUser));
-
-      setToken(fakeToken);
-      setUser(fakeUser);
-    }
-  }, [token]);
-
-
+  // Carrega token/usuário do localStorage ao iniciar
   useEffect(() => {
     const stored = window.localStorage.getItem(TOKEN_KEY);
     const storedUser = window.localStorage.getItem(USER_KEY);
@@ -54,20 +40,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    // 🔥 MODO DESENVOLVIMENTO: simula login sem backend
-    const fakeToken = "dev-token";
-    const fakeUser = { email };
-
-    window.localStorage.setItem(TOKEN_KEY, fakeToken);
-    window.localStorage.setItem(USER_KEY, JSON.stringify(fakeUser));
-
-    setToken(fakeToken);
-    setUser(fakeUser);
+    const response = await authApi.login(email, password);
+    if (response?.access_token) {
+      const authUser = { email };
+      window.localStorage.setItem(TOKEN_KEY, response.access_token);
+      window.localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+      setToken(response.access_token);
+      setUser(authUser);
+    } else {
+      throw new Error("Credenciais inválidas");
+    }
   }, []);
 
-
   const register = useCallback(async (name: string, email: string, password: string) => {
-    await authApi.register(name, email, password);
+    const response = await authApi.register(name, email, password);
+    if (response?.access_token) {
+      const authUser = { name, email };
+      window.localStorage.setItem(TOKEN_KEY, response.access_token);
+      window.localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+      setToken(response.access_token);
+      setUser(authUser);
+    }
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {

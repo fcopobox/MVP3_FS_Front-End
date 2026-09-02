@@ -22,21 +22,17 @@ export function LoginPage() {
     setError(null);
 
     try {
-      // 🔥 MODO DESENVOLVIMENTO: simula login sem backend
-      localStorage.setItem("weathermap.token", "dev-token");
-      localStorage.setItem("weathermap.user", JSON.stringify({ email }));
-
+      await login(email.trim(), password);
       await navigate({ to: "/", replace: true });
     } catch (loginError) {
-      setError("Erro no modo de desenvolvimento.");
+      setError((loginError as Error).message || "Erro ao conectar com o servidor.");
     } finally {
       setLoading(false);
     }
   }
 
-
   return (
-    <AuthShell title="Entrar" subtitle="Acesse sua conta para consultar CEPs, mapas e clima.">
+    <AuthShell title="Entrar" subtitle="Acesse sua conta para consultar mapa e clima">
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <label htmlFor="email" className="text-sm text-muted-foreground">E-mail</label>

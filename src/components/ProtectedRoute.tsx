@@ -13,10 +13,18 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     }
   }, [ready, isAuthenticated, navigate]);
 
-  if (!ready || !isAuthenticated) {
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader label="Verificando sessão..." />
+        <Loader label="Carregando sessão..." />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader label="Redirecionando para login..." />
       </div>
     );
   }
