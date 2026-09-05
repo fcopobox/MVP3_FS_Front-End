@@ -6,6 +6,7 @@ type Props = {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export default function Autocomplete({
@@ -13,7 +14,8 @@ export default function Autocomplete({
     items,
     value,
     onChange,
-    placeholder = "Digite para buscar..."
+    placeholder = "Digite para buscar...",
+    onKeyDown,
 }: Props) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
@@ -111,7 +113,7 @@ export default function Autocomplete({
                     // }
                 }}
                 onFocus={() => setOpen(true)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={onKeyDown}
                 placeholder={placeholder}
                 className="
                     w-full bg-input text-foreground border border-border rounded-md px-3 py-2

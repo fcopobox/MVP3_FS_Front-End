@@ -10,6 +10,7 @@ type Props = {
     onSubmit: (data: any) => void;
 };
 
+
 export function LocationForm({ onSubmit }: Props) {
     const [mode, setMode] = useState<"cep" | "regional">("cep");
 
@@ -158,6 +159,12 @@ export function LocationForm({ onSubmit }: Props) {
 
                             setCep(formatted);
                         }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                handleSubmit(e);
+                            }
+                        }}
                         maxLength={9}
                         className="w-full bg-input text-foreground border border-border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="00000-000"
@@ -217,6 +224,12 @@ export function LocationForm({ onSubmit }: Props) {
                             value={bairro}
                             onChange={setBairro}
                             placeholder="Digite para buscar..."
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleSubmit(e);
+                                }
+                            }}
                         />
                     )}
                 </>
