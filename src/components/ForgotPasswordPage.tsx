@@ -11,24 +11,27 @@ export function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Mock - deve ser alterada para funcionar de fato com o backend, mas para o MVP, simula o envio do e-mail.  
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
     setError(null);
+
     try {
       await resetPassword(email.trim());
-      setSent(true);
-    } catch (resetError) {
-      setError((resetError as Error).message);
+    } catch {
+      // Ignorar erros no MVP
     } finally {
+      setSent(true);
       setLoading(false);
     }
   }
 
+
   return (
     <AuthShell
       title="Esqueci a senha"
-      subtitle="Enviaremos as instruções de recuperação para o seu e-mail."
+      subtitle=""
     >
       {sent ? (
         <p className="rounded-lg border border-border bg-card/60 px-3 py-3 text-sm">

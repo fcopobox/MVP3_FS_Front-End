@@ -4,7 +4,7 @@ import { authApi } from "@/lib/api";
 const TOKEN_KEY = "weathermap.token";
 const USER_KEY = "weathermap.user";
 
-export type AuthUser = { name?: string; email?: string };
+export type AuthUser = { id: number; name?: string; email?: string };
 
 type AuthContextValue = {
   token: string | null;
@@ -15,6 +15,7 @@ type AuthContextValue = {
   register: (name: string, email: string, password: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   logout: () => void;
+  setUser: (u: AuthUser | null) => void;   // 🔧 ADICIONADO
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -24,25 +25,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(false);
 
-  // Carrega token/usuário do localStorage ao iniciar
   useEffect(() => {
     const stored = window.localStorage.getItem(TOKEN_KEY);
     const storedUser = window.localStorage.getItem(USER_KEY);
+
     if (stored) setToken(stored);
+
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser) as AuthUser);
+        const parsed = JSON.parse(storedUser) as AuthUser;
+
+        if (!parsed.id) {
+          window.localStorage.removeItem(USER_KEY);
+        } else {
+          setUser(parsed);
+        }
+
       } catch {
         /* ignore malformed cache */
       }
     }
+
     setReady(true);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     const response = await authApi.login(email, password);
     if (response?.access_token) {
-      const authUser = { email };
+      const authUser = {
+        id: response.user.id,
+        name: response.user.name,
+        email: response.user.email
+      };
+
       window.localStorage.setItem(TOKEN_KEY, response.access_token);
       window.localStorage.setItem(USER_KEY, JSON.stringify(authUser));
       setToken(response.access_token);
@@ -54,12 +69,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (name: string, email: string, password: string) => {
     const response = await authApi.register(name, email, password);
+
     if (response?.access_token) {
-      const authUser = { name, email };
+      const authUser = {
+        id: response.id,
+        name: response.name,
+        email: response.email
+      };
+
       window.localStorage.setItem(TOKEN_KEY, response.access_token);
       window.localStorage.setItem(USER_KEY, JSON.stringify(authUser));
       setToken(response.access_token);
       setUser(authUser);
+    } else {
+      throw new Error("Erro ao cadastrar usuário.");
     }
   }, []);
 
@@ -84,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       resetPassword,
       logout,
+      setUser,   // 🔧 ADICIONADO
     }),
     [token, user, ready, login, register, resetPassword, logout],
   );

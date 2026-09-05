@@ -38,60 +38,108 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
   return data as T;
 }
 
+/* ---------------------------
+   PUT JSON (necessário p/ updateUser)
+---------------------------- */
+async function putJson<T>(path: string, body: unknown, token: string): Promise<T> {
+  const response = await fetch(`${API_URL}${path}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      token: token,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = (await response.json().catch(() => null)) as
+    | (T & { detail?: string })
+    | null;
+
+  if (!response.ok) {
+    throw new Error(data?.detail ?? "Falha na requisição.");
+  }
+
+  return data as T;
+}
+
+
+/* ---------------------------
+   DELETE JSON (necessário p/ deleteUser)
+---------------------------- */
+async function deleteJson<T>(path: string, token: string): Promise<T> {
+  const response = await fetch(`${API_URL}${path}`, {
+    method: "DELETE",
+    headers: {
+      token: token,
+    },
+  });
+
+  const data = (await response.json().catch(() => null)) as
+    | (T & { detail?: string })
+    | null;
+
+  if (!response.ok) {
+    throw new Error(data?.detail ?? "Falha na requisição.");
+  }
+
+  return data as T;
+}
+
 export type LoginResponse = {
   access_token?: string;
   token?: string;
   id_token?: string;
-  user?: { name?: string; email?: string };
+  user?: { id?: number; name?: string; email?: string };
 };
 
 export const authApi = {
-  login: (email: string, password: string) =>
-    postJson<LoginResponse>("/login", { email, password }),
+  async login(email: string, password: string) {
+    return postJson<{
+      access_token: string;
+      token_type: string;
+      user: { id: number; name: string; email: string };
+    }>("/user/login", { email, password });
+  },
 
-  register: (name: string, email: string, password: string) =>
-    postJson<{ ok?: boolean; access_token?: string }>("/auth/register", {
+  async register(name: string, email: string, password: string) {
+    return postJson<{
+      id: number;
+      name: string;
+      email: string;
+      access_token: string;
+      token_type: string;
+    }>("/user/register", {
       name,
       email,
       password,
-    }),
-
-  resetPassword: (email: string) =>
-    postJson<{ ok?: boolean }>("/auth/reset-password", { email }),
-
-  updateUser: async (data: { name?: string; email?: string }, token: string) => {
-    const response = await fetch(`${API_URL}/auth/update`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
     });
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => null);
-      throw new Error(err?.detail ?? "Erro ao atualizar usuário.");
-    }
-    return response.json();
   },
 
-  deleteUser: async (token: string) => {
-    const response = await fetch(`${API_URL}/auth/delete`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => null);
-      throw new Error(err?.detail ?? "Erro ao excluir usuário.");
-    }
-    return response.json();
+  /* ---------------------------
+     UPDATE USER 
+  ---------------------------- */
+  async updateUser(id: number, data: { name?: string; email?: string }, token: string) {
+    return putJson(`/user/${id}`, data, token);
   },
-};
 
+  /* ---------------------------
+     DELETE USER 
+  ---------------------------- */
+  async deleteUser(id: number, token: string) {
+    return deleteJson(`/user/${id}`, token);
+  },
+
+  async resetPassword(email: string) {
+    return postJson("/reset-password", { email });
+  },
+
+  /* ---------------------------
+     CHANGE PASSWORD
+  ---------------------------- */
+  async changePassword(id: number, data: { old_password: string; new_password: string }, token: string) {
+    return putJson(`/user/${id}/change-password`, data, token);
+  }
+}
 
 export type CepAddress = {
   cep: string;
@@ -149,7 +197,7 @@ export async function geocodeRegional(params: {
   const { estado, cidade, bairro } = params;
 
   const cityResponse = await fetch(
-    `https://servicodados.ibge.gov.br/api/v1/localidades/municipios/${cidade}`
+    `https://servicodados.ibge.gov.br/api/v1/localidades/municipios/${cidade}`,
   );
 
   if (!cityResponse.ok) {
@@ -164,7 +212,7 @@ export async function geocodeRegional(params: {
     : `${cityName}, ${estado}, Brasil`;
 
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-    query
+    query,
   )}&format=json&limit=1`;
 
   const response = await fetch(url, { headers: { Accept: "application/json" } });
