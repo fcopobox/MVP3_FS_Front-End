@@ -75,6 +75,10 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
               14,
               { duration: 0.8 }
             );
+            // força o mapa a recalcular o tamanho após mudanças no layout
+            setTimeout(() => {
+              map.invalidateSize();
+            }, 300);
           }
         });
 
@@ -125,6 +129,10 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
     if (label) markerRef.current.bindPopup(label);
 
     map.flyTo(position, 14, { duration: 0.8 });
+    // força o mapa a recalcular o tamanho após mudanças no layout
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
   }, [coords, label]);
 
   // Camadas de nuvens e precipitação
