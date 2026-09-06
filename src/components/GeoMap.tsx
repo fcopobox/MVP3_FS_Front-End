@@ -16,34 +16,77 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
   const markerRef = useRef<L.Marker | null>(null);
   const cloudLayerRef = useRef<L.TileLayer | null>(null);
   const precipitationLayerRef = useRef<L.TileLayer | null>(null);
+  const coordsRef = useRef<Coordinates | null>(null);
 
+  // manter sempre o último coords disponível para o botão
+  useEffect(() => {
+    coordsRef.current = coords;
+  }, [coords]);
+
+  // Inicialização do mapa + criação do botão de centralizar (uma vez só)
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
     const map = L.map(containerRef.current, {
       zoomControl: true,
-
-      // Zoom mínimo e máximo totalmente liberados
-      minZoom: 2,     // pode ir até o limite do planeta
-      maxZoom: 18,    // limite real do OpenStreetMap
+      minZoom: 2,
+      maxZoom: 18,
     }).setView([-14.235, -51.925], 4);
 
-    // Limitar arrasto ao planeta (evita áreas vazias)
     map.setMaxBounds([
-      [-85, -180],  // canto inferior esquerdo
-      [85, 180],    // canto superior direito
+      [-85, -180],
+      [85, 180],
     ]);
 
-    // Impede que o usuário arraste para fora
     map.options.maxBoundsViscosity = 1.0;
 
-    // Tile layer base
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19, // OSM permite até 19
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
     mapRef.current = map;
+
+    const CenterControl = L.Control.extend({
+      options: { position: "topleft" },
+
+      onAdd: function () {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control");
+
+        const button = L.DomUtil.create("a", "", container);
+        button.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3 3h-2v4h4V7l3 3-3 3v-2h-4v4h2l-3 3-3-3h2v-4H7v2l-3-3 3-3v2h4V5H9l3-3z"/>
+                              </svg>
+                            </div>
+                            `;
+        button.title = "Centralizar mapa";
+        button.href = "#";
+
+        L.DomEvent.on(button, "click", (e) => {
+          L.DomEvent.stopPropagation(e);
+          L.DomEvent.preventDefault(e);
+
+          const currentCoords = coordsRef.current;
+          if (mapRef.current && currentCoords) {
+            mapRef.current.flyTo(
+              [currentCoords.lat, currentCoords.lon],
+              14,
+              { duration: 0.8 }
+            );
+            // força o mapa a recalcular o tamanho após mudanças no layout
+            setTimeout(() => {
+              map.invalidateSize();
+            }, 300);
+          }
+        });
+
+        return container;
+      },
+    });
+
+    map.addControl(new CenterControl());
 
     return () => {
       map.remove();
@@ -54,7 +97,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
     };
   }, []);
 
-
+  // Atualização do marker e flyTo
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !coords) return;
@@ -64,10 +107,20 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
     if (!markerRef.current) {
       const icon = L.divIcon({
         className: "",
-        html: '<span style="display:block;width:18px;height:18px;border-radius:9999px;background:oklch(0.72 0.15 226);box-shadow:0 0 0 6px oklch(0.72 0.15 226 / 30%)"></span>',
+        html: `
+          <span style="
+            display:block;
+            width:18px;
+            height:18px;
+            border-radius:9999px;
+            background:oklch(0.72 0.15 226);
+            box-shadow:0 0 0 6px oklch(0.72 0.15 226 / 30%);
+          "></span>
+        `,
         iconSize: [18, 18],
         iconAnchor: [9, 9],
       });
+
       markerRef.current = L.marker(position, { icon }).addTo(map);
     } else {
       markerRef.current.setLatLng(position);
@@ -76,8 +129,13 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
     if (label) markerRef.current.bindPopup(label);
 
     map.flyTo(position, 14, { duration: 0.8 });
+    // força o mapa a recalcular o tamanho após mudanças no layout
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
   }, [coords, label]);
 
+  // Camadas de nuvens e precipitação
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -86,7 +144,6 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
     if (!key) return;
 
     if (clouds) {
-      // NUVENS — camada inferior
       if (!cloudLayerRef.current) {
         cloudLayerRef.current = L.tileLayer(
           `https://tile.openweathermap.org/map/clouds/{z}/{x}/{y}.png?appid=${key}`,
@@ -105,7 +162,6 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
         cloudsContainer.style.filter = "brightness(0.75) contrast(1.25)";
       }
 
-      // PRECIPITAÇÃO — camada superior
       if (!precipitationLayerRef.current) {
         precipitationLayerRef.current = L.tileLayer(
           `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${key}`,
@@ -123,17 +179,15 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
         precipContainer.style.mixBlendMode = "darken";
         precipContainer.style.filter = "brightness(0.65) contrast(1.35)";
       }
-
     } else {
-      if (precipitationLayerRef.current) map.removeLayer(precipitationLayerRef.current);
+      if (precipitationLayerRef.current)
+        map.removeLayer(precipitationLayerRef.current);
       if (cloudLayerRef.current) map.removeLayer(cloudLayerRef.current);
     }
   }, [clouds]);
 
   return (
-    <div
-      className="relative w-full min-h-[350px] sm:min-h-[400px] md:min-h-[500px] lg:h-full rounded-2xl overflow-hidden"
-    >
+    <div className="relative w-full min-h-[350px] sm:min-h-[400px] md:min-h-[500px] lg:h-full rounded-2xl overflow-hidden">
       <div ref={containerRef} className="absolute inset-0" />
 
       <button
