@@ -10,33 +10,6 @@ type Props = {
     onSubmit: (data: any) => void;
 };
 
-// Lista fixa de bairros do Rio de Janeiro (ordenada)
-// A API do IBGE não retorna os Bairros do Rio de Janeiro, então foi usada uma lista fixa
-const bairrosRio = [
-    "Abolição", "Água Santa", "Alto da Boa Vista", "Anchieta", "Andaraí", "Bancários",
-    "Barra da Tijuca", "Barra de Guaratiba", "Benfica", "Bento Ribeiro", "Bonsucesso",
-    "Botafogo", "Brás de Pina", "Cachambi", "Cacuia", "Camorim", "Campinho", "Campo Grande",
-    "Cascadura", "Catete", "Catumbi", "Cidade de Deus", "Cidade Nova", "Cocotá", "Colégio",
-    "Copacabana", "Cordovil", "Cosme Velho", "Cosmos", "Curicica", "Del Castilho",
-    "Deodoro", "Encantado", "Engenho da Rainha", "Engenho de Dentro", "Engenho Novo",
-    "Estácio", "Flamengo", "Freguesia (Ilha)", "Freguesia (Jacarepaguá)", "Gávea",
-    "Grajaú", "Guadalupe", "Guaratiba", "Higienópolis", "Honório Gurgel", "Humaitá",
-    "Inhaúma", "Ipanema", "Irajá", "Itanhangá", "Jacaré", "Jacarezinho", "Jacarepaguá",
-    "Jardim América", "Jardim Botânico", "Jardim Carioca", "Jardim Guanabara",
-    "Jardim Sulacap", "Lagoa", "Lapa", "Leblon", "Leme", "Lins de Vasconcelos",
-    "Madureira", "Magalhães Bastos", "Mangueira", "Maracanã", "Maria da Graça",
-    "Méier", "Moneró", "Olaria", "Padre Miguel", "Paquetá", "Parada de Lucas",
-    "Pavuna", "Pechincha", "Pedra de Guaratiba", "Penha", "Penha Circular",
-    "Piedade", "Pilares", "Pitangueiras", "Praia da Bandeira", "Quintino Bocaiúva",
-    "Realengo", "Recreio dos Bandeirantes", "Riachuelo", "Ribeira", "Rocinha",
-    "Rocha", "Santa Cruz", "Santa Teresa", "Santíssimo", "Santo Cristo",
-    "São Conrado", "São Cristóvão", "São Francisco Xavier", "Saúde", "Senador Camará",
-    "Senador Vasconcelos", "Sepetiba", "Tanque", "Taquara", "Tijuca", "Todos os Santos",
-    "Tomás Coelho", "Turiaçu", "Urca", "Vargem Grande", "Vargem Pequena",
-    "Vaz Lobo", "Vicente de Carvalho", "Vidigal", "Vigário Geral", "Vila da Penha",
-    "Vila Isabel", "Vila Kosmos", "Vila Militar", "Vista Alegre", "Zumbi"
-].sort();
-
 export function LocationForm({ onSubmit }: Props) {
     const [mode, setMode] = useState<"cep" | "regional">("cep");
 
@@ -73,22 +46,11 @@ export function LocationForm({ onSubmit }: Props) {
             );
     }, [estado]);
 
-    // Carregar bairros ao escolher cidade
+    // Carregar bairros ao escolher cidade (Nominatim)
     useEffect(() => {
         if (!cidadeNome || !estado) return;
 
-        // Se for Rio de Janeiro → usar lista fixa
-        if (cidadeNome.toLowerCase() === "rio de janeiro") {
-            const lista = bairrosRio.map((nome, idx) => ({
-                id: idx + 1,
-                nome
-            }));
-            setBairros(lista);
-            return;
-        }
-
-        // Caso contrário → usar Nominatim
-        const url = `https://nominatim.openstreetmap.org/search?city=${cidadeNome}&country=Brazil&format=json&addressdetails=1&limit=500`;
+        const url = `https://nominatim.openstreetmap.org/search?city=${cidadeNome}&state=${estado}&country=Brazil&format=json&addressdetails=1&limit=500`;
 
         fetch(url)
             .then((r) => r.json())
@@ -156,8 +118,8 @@ export function LocationForm({ onSubmit }: Props) {
                 <button
                     type="button"
                     className={`px-3 py-2 rounded-md font-medium transition ${mode === "cep"
-                        ? "bg-primary text-primary-foreground shadow-glow"
-                        : "bg-muted text-muted-foreground"
+                            ? "bg-primary text-primary-foreground shadow-glow"
+                            : "bg-muted text-muted-foreground"
                         }`}
                     onClick={() => setMode("cep")}
                 >
@@ -167,8 +129,8 @@ export function LocationForm({ onSubmit }: Props) {
                 <button
                     type="button"
                     className={`px-3 py-2 rounded-md font-medium transition ${mode === "regional"
-                        ? "bg-primary text-primary-foreground shadow-glow"
-                        : "bg-muted text-muted-foreground"
+                            ? "bg-primary text-primary-foreground shadow-glow"
+                            : "bg-muted text-muted-foreground"
                         }`}
                     onClick={() => setMode("regional")}
                 >
