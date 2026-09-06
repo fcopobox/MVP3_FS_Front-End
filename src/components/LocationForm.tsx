@@ -145,7 +145,16 @@ export function LocationForm({ onSubmit }: Props) {
                         ? "bg-primary text-primary-foreground shadow-glow"
                         : "bg-muted text-muted-foreground"
                         }`}
-                    onClick={() => setMode("cep")}
+                    onClick={() => {
+                        setMode("cep"),
+                        setCep(""),
+                        setEstado(""),
+                        setCidade(""),
+                        setCidadeNome(""),
+                        setBairro(""),
+                        setCidades([]),
+                        setBairros([])
+                    }}
                 >
                     Buscar por CEP
                 </button>
