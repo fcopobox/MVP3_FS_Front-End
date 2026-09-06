@@ -87,29 +87,15 @@ export function LocationForm({ onSubmit }: Props) {
             return;
         }
 
-        // Caso contrário → usar Nominatim
-        const url = `https://nominatim.openstreetmap.org/search?city=${cidadeNome}&country=Brazil&format=json&addressdetails=1&limit=500`;
-
-        fetch(url)
+        // Caso contrário buscar bairros IBGE (não funciona para o Rio de Janeiro)
+        fetch(
+            `https://servicodados.ibge.gov.br/api/v1/localidades/municipios/${cidade}/distritos`
+        )
             .then((r) => r.json())
-            .then((data: any[]) => {
-                const lista = new Set<string>();
-
-                data.forEach((item) => {
-                    const addr = item.address;
-                    if (addr.suburb) lista.add(addr.suburb);
-                    if (addr.neighbourhood) lista.add(addr.neighbourhood);
-                    if (addr.city_district) lista.add(addr.city_district);
-                });
-
-                const bairrosFormatados = Array.from(lista)
-                    .sort()
-                    .map((nome, idx) => ({ id: idx + 1, nome }));
-
-                setBairros(bairrosFormatados);
-            })
-            .catch(() => setBairros([]));
-    }, [cidadeNome, estado]);
+            .then((data: BairroIBGE[]) =>
+                setBairros(data.sort((a, b) => a.nome.localeCompare(b.nome)))
+            );
+    }, [cidade]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
