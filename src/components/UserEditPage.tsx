@@ -198,7 +198,8 @@ export function UserEditPage() {
                         <DialogHeader>
                             <DialogTitle>Excluir conta</DialogTitle>
                             <DialogDescription>
-                                Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.
+                                Tem certeza que deseja excluir sua conta?<br />
+                                ATENÇÃO: Esta ação não pode ser desfeita.
                             </DialogDescription>
                         </DialogHeader>
 
