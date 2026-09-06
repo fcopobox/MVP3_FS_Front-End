@@ -54,7 +54,7 @@ export function Header() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 0 016 0z" />
             </svg>
             <span className="hidden text-sm text-muted-foreground sm:inline">
-              {user?.email ?? "Usuário"}
+              {user?.name ?? "Usuário"}
             </span>
           </button>
 
@@ -69,6 +69,16 @@ export function Header() {
               >
                 Editar dados
               </button>
+              <button
+                className="block w-full px-4 py-2 text-left text-sm hover:bg-muted"
+                onClick={() => {
+                  setMenuOpen(false);
+                  void navigate({ to: "/change-password" });
+                }}
+              >
+                Alterar senha
+              </button>
+
               <button
                 className="block w-full px-4 py-2 text-left text-sm hover:bg-muted"
                 onClick={() => {

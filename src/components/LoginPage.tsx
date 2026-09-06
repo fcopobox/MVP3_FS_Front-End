@@ -22,7 +22,7 @@ export function LoginPage() {
     setError(null);
 
     try {
-      await login(email.trim(), password);
+      await login(email.toLowerCase().trim(), password);
       await navigate({ to: "/", replace: true });
     } catch (loginError) {
       setError((loginError as Error).message || "Erro ao conectar com o servidor.");

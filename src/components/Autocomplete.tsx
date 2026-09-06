@@ -6,6 +6,7 @@ type Props = {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export default function Autocomplete({
@@ -13,7 +14,8 @@ export default function Autocomplete({
     items,
     value,
     onChange,
-    placeholder = "Digite para buscar..."
+    placeholder = "Digite para buscar...",
+    onKeyDown,
 }: Props) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
@@ -104,20 +106,27 @@ export default function Autocomplete({
                     setQuery(text);
                     setOpen(true);
                     onChange(text);
-                    // Se não há itens filtrados, ou se o texto não bate com nenhum item,
-                    // então o usuário está digitando um valor manual → enviar para o pai.
-                    // if (filtered.length === 0) {
-                    //     onChange(text);
-                    // }
                 }}
                 onFocus={() => setOpen(true)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={(e) => {
+                    // Navegação interna do autocomplete
+                    handleKeyDown(e);
+
+                    // Se o pai passou um onKeyDown (ex: submit no Enter)
+                    if (onKeyDown) {
+                        // Só chamamos quando a lista NÃO está aberta
+                        if (!open) {
+                            onKeyDown(e);
+                        }
+                    }
+                }}
                 placeholder={placeholder}
                 className="
-                    w-full bg-input text-foreground border border-border rounded-md px-3 py-2
-                    focus:outline-none focus:ring-2 focus:ring-primary
-                "
+        w-full bg-input text-foreground border border-border rounded-md px-3 py-2
+        focus:outline-none focus:ring-2 focus:ring-primary
+    "
             />
+
 
             {open && filtered.length > 0 && (
                 <ul
