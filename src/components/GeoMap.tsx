@@ -48,6 +48,20 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
 
     mapRef.current = map;
 
+    // ⭐ ADIÇÃO: observar mudanças no tamanho do container
+    const observer = new ResizeObserver(() => {
+      const currentCoords = coordsRef.current;
+      if (mapRef.current && currentCoords) {
+        mapRef.current.invalidateSize();
+        mapRef.current.setView(
+          [currentCoords.lat, currentCoords.lon],
+          14
+        );
+      }
+    });
+
+    observer.observe(containerRef.current);
+
     const CenterControl = L.Control.extend({
       options: { position: "topleft" },
 
@@ -56,11 +70,10 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
 
         const button = L.DomUtil.create("a", "", container);
         button.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2l3 3h-2v4h4V7l3 3-3 3v-2h-4v4h2l-3 3-3-3h2v-4H7v2l-3-3 3-3v2h4V5H9l3-3z"/>
-                              </svg>
-                            </div>
-                            `;
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2l3 3h-2v4h4V7l3 3-3 3v-2h-4v4h2l-3 3-3-3h2v-4H7v2l-3-3 3-3v2h4V5H9l3-3z"/>
+                            </svg>
+                          </div>`;
         button.title = "Centralizar mapa";
         button.href = "#";
 
@@ -75,7 +88,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
               14,
               { duration: 0.8 }
             );
-            // força o mapa a recalcular o tamanho após mudanças no layout
+
             setTimeout(() => {
               map.invalidateSize();
             }, 300);
@@ -89,6 +102,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
     map.addControl(new CenterControl());
 
     return () => {
+      observer.disconnect();
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
