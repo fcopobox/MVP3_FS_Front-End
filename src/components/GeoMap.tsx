@@ -21,15 +21,24 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
   const windLayerRef = useRef<L.TileLayer | null>(null);
   const tempLayerRef = useRef<L.TileLayer | null>(null);
 
+  const solarLayerRef = useRef<L.TileLayer | null>(null);
+  const pressureLayerRef = useRef<L.TileLayer | null>(null);
+  const airLayerRef = useRef<L.TileLayer | null>(null);
+
+
   const coordsRef = useRef<Coordinates | null>(null);
 
   // base layers
   const osmBaseLayerRef = useRef<L.TileLayer | null>(null);
   const whiteBaseLayerRef = useRef<L.TileLayer | null>(null);
 
-  // novos estados
+  // Camadas weather
   const [wind, setWind] = useState(false);
   const [temp, setTemp] = useState(false);
+  const [solar, setSolar] = useState(false);
+  const [pressure, setPressure] = useState(false);
+  const [air, setAir] = useState(false);
+
 
   // manter sempre o último coords disponível para o botão
   useEffect(() => {
@@ -153,7 +162,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
     if (map.hasLayer(osm)) map.removeLayer(osm);
     if (map.hasLayer(white)) map.removeLayer(white);
 
-    if (temp) {
+    if (temp || pressure || air || solar) {
       // temperatura ligada → usar mapa branco
       if (map.hasLayer(osm)) map.removeLayer(osm);
       if (!map.hasLayer(white)) white.addTo(map);
@@ -205,7 +214,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
       }
     }
 
-  }, [temp]);
+  }, [temp, pressure, air, solar]);
 
 
   // Atualização do marker e flyTo
@@ -357,7 +366,101 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
         map.removeLayer(tempLayerRef.current);
       }
     }
-  }, [temp]);
+  }, [temp, pressure, air, solar]);
+
+  // camada de radiação solar
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const key = getOpenWeatherKey();
+    if (!key) return;
+
+    if (solar) {
+      if (!solarLayerRef.current) {
+        solarLayerRef.current = L.tileLayer(
+          `https://maps.openweathermap.org/maps/2.0/weather/SOLAR_IRRADIANCE/{z}/{x}/{y}?appid=${key}`,
+          {
+            opacity: 0.85,
+            zIndex: 35,
+          }
+        );
+      }
+
+      solarLayerRef.current.addTo(map);
+
+      const container = solarLayerRef.current.getContainer();
+      if (container) {
+        container.style.mixBlendMode = "multiply";
+        container.style.filter = "brightness(1.2) contrast(1.4)";
+      }
+    } else {
+      if (solarLayerRef.current) map.removeLayer(solarLayerRef.current);
+    }
+  }, [solar]);
+
+  // camada de pressão atmosférica
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const key = getOpenWeatherKey();
+    if (!key) return;
+
+    if (pressure) {
+      if (!pressureLayerRef.current) {
+        pressureLayerRef.current = L.tileLayer(
+          `https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${key}`,
+          {
+            opacity: 0.9,
+            zIndex: 32,
+          }
+        );
+      }
+
+      pressureLayerRef.current.addTo(map);
+
+      const container = pressureLayerRef.current.getContainer();
+      if (container) {
+        container.style.mixBlendMode = "multiply";
+        container.style.filter = "contrast(1.3)";
+      }
+    } else {
+      if (pressureLayerRef.current) map.removeLayer(pressureLayerRef.current);
+    }
+  }, [pressure]);
+
+  // camada de poluição do ar
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const key = getOpenWeatherKey();
+    if (!key) return;
+
+    if (air) {
+      if (!airLayerRef.current) {
+        airLayerRef.current = L.tileLayer(
+          `https://tile.openweathermap.org/map/air_pollution/{z}/{x}/{y}.png?appid=${key}`,
+          {
+            opacity: 0.9,
+            zIndex: 33,
+          }
+        );
+      }
+
+      airLayerRef.current.addTo(map);
+
+      const container = airLayerRef.current.getContainer();
+      if (container) {
+        container.style.mixBlendMode = "multiply";
+        container.style.filter = "brightness(1.1) contrast(1.4)";
+      }
+    } else {
+      if (airLayerRef.current) map.removeLayer(airLayerRef.current);
+    }
+  }, [air]);
+
 
   return (
     <div className="relative w-full min-h-[350px] sm:min-h-[400px] md:min-h-[500px] lg:h-full rounded-2xl overflow-hidden">
@@ -412,6 +515,25 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
           </span>
         </button>
 
+        {/* Controle Pressão */}
+        <button
+          onClick={() => setPressure(!pressure)}
+          role="switch"
+          aria-checked={pressure}
+          className="flex items-center justify-between gap-3 w-full text-sm"
+        >
+          <span className="font-medium">Pressão atm</span>
+          <span
+            className={`relative h-5 w-10 rounded-full transition-colors ${pressure ? "bg-green-500" : "bg-muted"
+              }`}
+          >
+            <span
+              className={`absolute top-0.5 h-4 w-4 rounded-full bg-background shadow transition-all ${pressure ? "left-5" : "left-0.5"
+                }`}
+            />
+          </span>
+        </button>
+
         {/* Controle Temperatura */}
         <button
           onClick={() => setTemp(!temp)}
@@ -432,58 +554,124 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
           </span>
         </button>
 
-        {/* Escala de temperatura (aparece somente quando temp = true) */}
-        {temp && (
-          <div className="flex flex-col items-center mt-2">
-            <span className="text-xs font-medium mb-2">(°C)</span>
+        {/* Escalas lado a lado */}
+        <div className="flex flex-row gap-4 mt-2">
 
-            <div className="relative h-40 w-14">
-              <div
-                className="absolute left-0 top-0 h-full w-4 rounded-md overflow-hidden"
-                style={{
-                  background: `
-                  linear-gradient(
-                    to bottom,
-                    #800000 0%,
-                    #ff0000 15%,
-                    #ffa500 30%,
-                    #ffff00 45%,
-                    #00ff00 60%,
-                    #00ffff 75%,
-                    #0000ff 90%,
-                    #ff00ff 100%
-                  )
-                `,
-                }}
-              />
+          {/* Escala de pressão */}
+          {pressure && (
+            <div
+              className="flex flex-col items-center 
+                 bg-background/10 backdrop-blur-sm border border-border/40 
+                 rounded-xl px-3 py-3 shadow"
+            >
+              <span className="text-xs font-medium mb-2">hPa</span>
 
-              <span className="absolute left-6 text-[10px]" style={{ top: "0%" }}>
-                +40°
-              </span>
-              <span className="absolute left-6 text-[10px]" style={{ top: "15%" }}>
-                +30°
-              </span>
-              <span className="absolute left-6 text-[10px]" style={{ top: "30%" }}>
-                +20°
-              </span>
-              <span className="absolute left-6 text-[10px]" style={{ top: "45%" }}>
-                +10°
-              </span>
-              <span className="absolute left-6 text-[10px]" style={{ top: "60%" }}>
-                0°
-              </span>
-              <span className="absolute left-6 text-[10px]" style={{ top: "75%" }}>
-                -10°
-              </span>
-              <span className="absolute left-6 text-[10px]" style={{ top: "90%" }}>
-                -20°
-              </span>
-              <span className="absolute left-6 text-[10px]" style={{ top: "100%" }}>
-                -40°
-              </span>
+              <div className="relative h-40 w-14">
+
+                {/* Gradiente de pressão (OpenWeather padrão) */}
+                <div
+                  className="absolute left-0 top-0 h-full w-4 rounded-md overflow-hidden"
+                  style={{
+                    background: `
+              linear-gradient(
+                to bottom,
+                #4b0082 0%,     /* 1030 hPa - alta pressão */
+                #0000ff 20%,    /* 1020 */
+                #00ffff 40%,    /* 1010 */
+                #00ff00 60%,    /* 1000 */
+                #ffff00 75%,    /* 990 */
+                #ffa500 90%,    /* 980 */
+                #ff0000 100%    /* 970 hPa - baixa pressão */
+              )
+            `,
+                  }}
+                />
+
+                {/* Labels */}
+                <span className="absolute left-6 text-[10px]" style={{ top: "0%" }}>
+                  1030
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "20%" }}>
+                  1020
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "40%" }}>
+                  1010
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "60%" }}>
+                  1000
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "75%" }}>
+                  990
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "90%" }}>
+                  980
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "100%" }}>
+                  970
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Escala de temperatura */}
+          {temp && (
+            <div
+              className="flex flex-col items-center 
+                 bg-background/10 backdrop-blur-sm border border-border/40 
+                 rounded-xl px-3 py-3 shadow"
+            >
+              <span className="text-xs font-medium mb-2">°C</span>
+
+              <div className="relative h-40 w-14">
+                <div
+                  className="absolute left-0 top-0 h-full w-4 rounded-md overflow-hidden"
+                  style={{
+                    background: `
+              linear-gradient(
+                to bottom,
+                #800000 0%,
+                #ff0000 15%,
+                #ffa500 30%,
+                #ffff00 45%,
+                #00ff00 60%,
+                #00ffff 75%,
+                #0000ff 90%,
+                #ff00ff 100%
+              )
+            `,
+                  }}
+                />
+
+                <span className="absolute left-6 text-[10px]" style={{ top: "0%" }}>
+                  +40°
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "15%" }}>
+                  +30°
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "30%" }}>
+                  +20°
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "45%" }}>
+                  +10°
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "60%" }}>
+                  0°
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "75%" }}>
+                  -10°
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "90%" }}>
+                  -20°
+                </span>
+                <span className="absolute left-6 text-[10px]" style={{ top: "100%" }}>
+                  -40°
+                </span>
+              </div>
+            </div>
+          )}
+
+        </div>
+
       </div>
     </div>
   );
