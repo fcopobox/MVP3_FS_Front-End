@@ -134,7 +134,51 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
       },
     });
 
+    const ResetZoomControl = L.Control.extend({
+      options: { position: "topleft" },
+
+      onAdd: function () {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control");
+
+        const button = L.DomUtil.create("a", "", container);
+        button.innerHTML = `
+  <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+      <!-- Cantoneiras -->
+      <path d="M4 8 V4 H8" />        <!-- canto superior esquerdo -->
+      <path d="M16 4 H20 V8" />      <!-- canto superior direito -->
+      <path d="M20 16 V20 H16" />    <!-- canto inferior direito -->
+      <path d="M8 20 H4 V16" />      <!-- canto inferior esquerdo -->
+
+    </svg>
+  </div>
+`;
+
+        button.title = "Resetar zoom";
+        button.href = "#";
+
+        L.DomEvent.on(button, "click", (e) => {
+          L.DomEvent.stopPropagation(e);
+          L.DomEvent.preventDefault(e);
+
+          // posição inicial do seu mapa
+          const initialCenter: [number, number] = [-14.235, -51.925];
+          const initialZoom = 4;
+
+          map.flyTo(initialCenter, initialZoom, { duration: 0.8 });
+
+          setTimeout(() => {
+            map.invalidateSize();
+          }, 300);
+        });
+
+        return container;
+      },
+    });
+
     map.addControl(new CenterControl());
+    map.addControl(new ResetZoomControl());
 
     return () => {
       observer.disconnect();
