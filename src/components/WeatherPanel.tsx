@@ -17,7 +17,7 @@ export function WeatherPanel() {
       <section className="surface rounded-2xl p-5">
         <h2 className="text-base font-semibold">Clima</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Busque uma localidade para ver as condições climáticas.
+          Busque uma localidade para ver seu mapa e as condições climáticas.
         </p>
       </section>
     );
