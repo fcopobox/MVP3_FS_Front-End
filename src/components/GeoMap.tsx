@@ -48,7 +48,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
 
     mapRef.current = map;
 
-    // ⭐ ADIÇÃO: observar mudanças no tamanho do container
+    // observar mudanças no tamanho do container
     const observer = new ResizeObserver(() => {
       const currentCoords = coordsRef.current;
       if (mapRef.current && currentCoords) {

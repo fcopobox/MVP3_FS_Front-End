@@ -35,7 +35,7 @@ export function ForgotPasswordPage() {
     >
       {sent ? (
         <p className="rounded-lg border border-border bg-card/60 px-3 py-3 text-sm">
-          Se o e-mail existir, você receberá as instruções em instantes.
+          Se o e-mail estiver cadastrado, você receberá as instruções em instantes.
         </p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-4">
