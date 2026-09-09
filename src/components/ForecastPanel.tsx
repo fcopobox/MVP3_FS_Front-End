@@ -56,8 +56,13 @@ export function ForecastPanel() {
     return (
         <section className="surface rounded-2xl p-5">
             <h2 className="text-base font-semibold mb-3">Previsão para 5 dias</h2>
-
-            <div className="flex gap-4 overflow-x-auto pb-2">
+            <div className="
+                    flex 
+                    flex-col 
+                    gap-4 
+                    pb-2
+                    sm:flex-row sm:overflow-x-auto
+                    ">
                 {proximosDias.map((dia, idx) => {
                     const min = Math.min(...dia.temps);
                     const max = Math.max(...dia.temps);
