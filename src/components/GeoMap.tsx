@@ -363,7 +363,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
         windLayerRef.current = L.tileLayer(
           `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${key}`,
           {
-            opacity: 0.85,
+            opacity: 1,
             attribution: "&copy; OpenWeatherMap",
             zIndex: 30,
           }
@@ -391,7 +391,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
           {
             opacity: 1.0,
             attribution: "&copy; OpenWeatherMap",
-            zIndex: 5,
+            zIndex: 40,
           }
         );
       }
@@ -426,7 +426,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
           `https://maps.openweathermap.org/maps/2.0/weather/SOLAR_IRRADIANCE/{z}/{x}/{y}?appid=${key}`,
           {
             opacity: 0.85,
-            zIndex: 35,
+            zIndex: 5,
           }
         );
       }
@@ -488,7 +488,7 @@ export function GeoMap({ coords, label, clouds, toggleClouds }: Props) {
           `https://tile.openweathermap.org/map/air_pollution/{z}/{x}/{y}.png?appid=${key}`,
           {
             opacity: 0.9,
-            zIndex: 33,
+            zIndex: 3,
           }
         );
       }
