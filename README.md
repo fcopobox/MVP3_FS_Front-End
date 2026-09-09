@@ -133,22 +133,6 @@ Se o container e a imagem não aparecerem na lista, a remoção foi concluída c
 
 ---
 
-### 11. Limpeza opcional (avançado)
-
-**Limpar containers, imagens, redes e cache não utilizados:**
-
------------------------------------
-`docker system prune -a -f`
------------------------------------
-
-**Limpar também volumes não utilizados:**
-
------------------------------------
-`docker system prune -a --volumes -f`
------------------------------------
-
----
-
 ## Rotas do Frontend
 
 A aplicação utiliza **TanStack Router** para navegação entre páginas, cada uma definida como um arquivo dentro do diretório `src/routes/`:
