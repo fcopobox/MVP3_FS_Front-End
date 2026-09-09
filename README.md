@@ -89,6 +89,7 @@ http://localhost:8080
 -----------------------------------
 
 ---
+## Após os testes, para excluir o projeto:
 
 ### 7. Parar o container
 
