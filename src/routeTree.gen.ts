@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as ChangePasswordRouteImport } from './routes/change-password'
 import { Route as EditRouteImport } from './routes/edit'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -19,6 +20,11 @@ import { Route as RegisterRouteImport } from './routes/register'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChangePasswordRoute = ChangePasswordRouteImport.update({
@@ -49,6 +55,7 @@ const RegisterRoute = RegisterRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/change-password': typeof ChangePasswordRoute
   '/edit': typeof EditRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/change-password': typeof ChangePasswordRoute
   '/edit': typeof EditRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/change-password': typeof ChangePasswordRoute
   '/edit': typeof EditRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -76,6 +85,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/change-password'
     | '/edit'
     | '/forgot-password'
@@ -84,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/change-password'
     | '/edit'
     | '/forgot-password'
@@ -92,6 +103,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/change-password'
     | '/edit'
     | '/forgot-password'
@@ -101,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   ChangePasswordRoute: typeof ChangePasswordRoute
   EditRoute: typeof EditRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -115,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/change-password': {
@@ -157,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   ChangePasswordRoute: ChangePasswordRoute,
   EditRoute: EditRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
