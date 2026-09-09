@@ -284,7 +284,7 @@ Para algumas localidades também fornece os distritos (bairros).
 - **Estados:**  
   https://servicodados.ibge.gov.br/api/v1/localidades/estados
 
-- **Municípios por estado:**  
+- **Municípios por Estado:**  
   https://servicodados.ibge.gov.br/api/v1/localidades/estados/{UF}/municipios
 
 - **Distritos por município:**  
