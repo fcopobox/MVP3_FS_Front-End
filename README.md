@@ -155,9 +155,9 @@ A aplicação utiliza **TanStack Router** para navegação entre páginas, cada 
 - `/` — Página inicial  
 - `/login` — Autenticação de usuário  
 - `/register` — Cadastro de novo usuário  
-- `/forgot-password` — Recuperação de senha  
 - `/edit` — Edição de dados do usuário autenticado  
 - `/change-password` — Alteração de senha 
+- `/forgot-password` — Recuperação de senha  
 - `/about` — Informações sobre o projeto
 
 Rotas protegidas dependem do **ticket JWT** fornecido pelo backend, garantindo que apenas usuários autenticados possam acessar páginas de perfil, edição e alteração de senha.
@@ -197,16 +197,16 @@ A estrutura do WeatherMap – Frontend é organizada de forma modular, separando
   Cada arquivo representa uma página da aplicação:
 
 - `index.tsx` — página inicial  
-- `login.tsx`, `forgot-password.tsx`, `change-password.tsx` — fluxo de autenticação  
-- `edit.tsx` — edição de dados do usuário autenticado  
-- `about.tsx` — página institucional  
+- `login.tsx`, `forgot-password.tsx` — fluxo de autenticação  
+- `edit.tsx`, `change-password.tsx` — edição de dados do usuário autenticado  
+- `about.tsx` — página sobre o projeto  
 - `__root.tsx` — layout raiz e configuração global das rotas  
 
   Arquivos auxiliares do router:
 
 - `router.ts` — instanciação do TanStack Router  
 - `routeTree.gen.ts` — árvore de rotas gerada automaticamente  
-- `start.ts`, `server.ts` — inicialização da aplicação em modo SPA/SSR
+- `start.ts` — inicialização da aplicação em modo SPA
 
 - `public/`  
   Arquivos públicos servidos diretamente pelo Vite (ex.: `favicon.svg`).
