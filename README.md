@@ -133,6 +133,16 @@ Se o container e a imagem não aparecerem na lista, a remoção foi concluída c
 
 ---
 
+### 11. Deletar a pasta onde o projeto foi clonado
+
+Após remover o container e a imagem Docker, você pode excluir a pasta do projeto caso não deseje mantê-la no computador.
+
+-----------------------------------
+`rmdir /s /q MVP3_FS_Front-End`
+-----------------------------------
+
+---
+
 ## Rotas do Frontend
 
 A aplicação utiliza **TanStack Router** para navegação entre páginas, cada uma definida como um arquivo dentro do diretório `src/routes/`:
