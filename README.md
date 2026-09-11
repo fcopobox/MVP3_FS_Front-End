@@ -344,6 +344,37 @@ Serviço de geocodificação e busca de localidades.
 
 ---
 
+## Diagrama de Componentes da Solução
+
+┌───────────────────────┐
+│  WeatherMap Frontend  │
+│                       │
+└───────┬─────────┬─────┘
+        │         │
+        │         │ Consumo direto
+        │         ▼
+        │   ┌───────────────┐
+        │   │ External APIs │
+        │   └───────────────┘
+        │
+        │ Autenticação
+        │ 
+        ▼
+┌───────────────────────────┐
+│    WeatherMap Backend     │
+│   Authentication Layer    |
+└──────────────┬────────────┘
+               │
+               │ Gerenciamento
+               │ de acesso aos dados
+               ▼
+      ┌─────────────────────┐
+      │      Database       │
+      │  User Data Storage  │
+      └─────────────────────┘
+
+---
+
 ## Licença
 
 Projeto acadêmico desenvolvido com fins educacionais para a Pós-Graduação em **Desenvolvimento Full Stack** da **PUC-Rio**.
