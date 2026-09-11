@@ -55,6 +55,14 @@ function AboutPage() {
                 <li>bcrypt (hash de senhas)</li>
                 <li>Docker (containerização)</li>
             </ul>
+            
+            {/* Diagrama de Arquitetura */}
+            <div className="mt-6">
+                <h2 className="text-xl font-semibold mt-6 mb-2">Diagrama de Arquitetura</h2>
+                <body>
+                    <img src="Diagrama.png" alt="Diagrama de arquitetura" />
+                </body>
+            </div>
 
             {/* Observação */}
             <p className="mt-6 text-sm text-gray-500">
