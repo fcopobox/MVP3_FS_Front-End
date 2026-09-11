@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import diagramaImg from '../assets/Diagrama.png';
 
 function AboutPage() {
     return (
@@ -60,7 +61,10 @@ function AboutPage() {
             <div className="mt-6">
                 <h2 className="text-xl font-semibold mt-6 mb-2">Diagrama de Arquitetura</h2>
                 <body>
-                    <img src="Diagrama.png" alt="Diagrama de arquitetura" />
+                    <img 
+                    src={diagramaImg} 
+                    alt="Diagrama de arquitetura" 
+                    />
                 </body>
             </div>
 
