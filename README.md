@@ -317,8 +317,9 @@ Serviço responsável por fornecer clima atual, previsão climática e, para o m
 Base cartográfica utilizada para exibir o mapa interativo no frontend.  
 Permite visualizar a localização consultada, marcadores e navegação geográfica.
 
-- **Camada de mapa (Tiles – API de mapas do OSM). Utilizada pelo Leaflet para renderizar o mapa:**  
-     
+- **Camada de mapa (Tiles – API de mapas do OSM).**  
+  Utilizada pelo Leaflet para renderizar o mapa:
+   
   https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
 
 - **Site oficial:**  
