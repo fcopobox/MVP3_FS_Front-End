@@ -343,37 +343,23 @@ Serviço de geocodificação e busca de localidades.
   https://nominatim.org/release-docs/latest/api/Overview/
 
 ---
-
 ## Diagrama de Componentes da Solução
 
-┌───────────────────────┐
-│  WeatherMap Frontend  │
-│                       │
-└───────┬─────────┬─────┘
-        │         │
-        │         │ Consumo direto
-        │         ▼
-        │   ┌───────────────┐
-        │   │ External APIs │
-        │   └───────────────┘
-        │
-        │ Autenticação
-        │ 
-        ▼
-┌───────────────────────────┐
-│    WeatherMap Backend     │
-│   Authentication Layer    |
-└──────────────┬────────────┘
-               │
-               │ Gerenciamento
-               │ de acesso aos dados
-               ▼
-      ┌─────────────────────┐
-      │      Database       │
-      │  User Data Storage  │
-      └─────────────────────┘
+```mermaid
+flowchart TD
 
----
+    FE[WeatherMap Frontend]
+
+    API[External APIs]
+
+    BE[WeatherMap Backend<br/>Authentication Layer]
+
+    DB[(Database<br/>User Data Storage)]
+
+    FE -->|Consumo direto| API
+    FE -->|Autenticação| BE
+    BE -->|Gerenciamento de acesso aos dados| DB
+```
 
 ## Licença
 
