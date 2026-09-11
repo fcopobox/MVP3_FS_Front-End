@@ -60,12 +60,10 @@ function AboutPage() {
             {/* Diagrama de Arquitetura */}
             <div className="mt-6">
                 <h2 className="text-xl font-semibold mt-6 mb-2">Diagrama de Arquitetura</h2>
-                <body>
                     <img 
                     src={diagramaImg} 
                     alt="Diagrama de arquitetura" 
                     />
-                </body>
             </div>
 
             {/* Observação */}
