@@ -40,7 +40,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [forecast, setForecast] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cloudsVisible, setCloudsVisible] = useState(true);
+  const [cloudsVisible, setCloudsVisible] = useState(false);
 
   // ============================
   // BUSCA POR CEP
