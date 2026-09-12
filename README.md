@@ -325,6 +325,9 @@ Permite visualizar a localização consultada, marcadores e navegação geográf
 - **Site oficial:**  
   https://www.openstreetmap.org/
 
+- **Documentação**
+https://wiki.openstreetmap.org/wiki/Overpass_API  
+
 - **Política de uso dos tiles:**  
   https://operations.osmfoundation.org/policies/tiles/
 
